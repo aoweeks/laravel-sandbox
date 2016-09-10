@@ -8,8 +8,53 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
+use Socalite;
+
 class AuthController extends Controller
 {
+    
+    /*
+    |---------------------------------------------------------------------------
+    |Socialite Stuff
+    |---------------------------------------------------------------------------*/
+    
+    /**
+     * Redirect the user to the GitHub authentication page.
+     *
+     * @return Response
+     */
+    public function redirectToProvider()
+    {
+        return \Socialite::driver('facebook')->fields([
+            'first_name', 'last_name', 'email', 'friends'
+        ])->scopes([
+            'email', 'user_friends'
+        ])->redirect();
+    }
+
+    /**
+     * Obtain the user information from GitHub.
+     *
+     * @return Response
+     */
+    public function handleProviderCallback()
+    {
+        $user = \Socialite::driver('facebook')->fields([
+            'first_name', 'last_name', 'email', 'friends'
+        ])->user();
+        
+        $newuser = User::firstOrCreate([
+            "email" => $user->email,
+            "name" => $user->user["first_name"]
+        ]);
+        
+
+        return view('fb', ["user" => $newuser]);
+        // $user->token;
+        
+    }
+    
+    
     /*
     |--------------------------------------------------------------------------
     | Registration & Login Controller

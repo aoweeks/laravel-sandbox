@@ -18,3 +18,6 @@ Route::get('/', function () {
 Route::auth();
 
 Route::get('/home', 'HomeController@index');
+
+Route::get('fbauth', 'Auth\AuthController@redirectToProvider');
+Route::get('fblogin', 'Auth\AuthController@handleProviderCallback');
